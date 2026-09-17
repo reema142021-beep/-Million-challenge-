@@ -1,673 +1,525 @@
 
-
 <!DOCTYPE html>
-
 <html lang="ar" dir="rtl">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<title>تحدي المليون</title>
-
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>تحدي المليون | النادي الاقتصادي</title>
 <style>
-
 *{box-sizing:border-box}
-
 body{margin:0;background:#f2f6fb;color:#172b45;font-family:Tahoma,Arial,sans-serif}
-
-header{background:#142d4e;color:white;padding:25px;text-align:center}
-
-header h1{margin:8px 0;font-size:30px}
-
+header{background:#142d4e;color:white;padding:28px 15px;text-align:center}
+header h1{font-size:30px;margin:10px 0}
 header p{color:#dce8f5}
-
 main{max-width:850px;margin:25px auto;padding:15px}
-
 .card{background:white;border-radius:18px;padding:23px;margin-bottom:18px;box-shadow:0 3px 15px #172b4512}
-
 h2{margin-top:0}
-
-.balance{font-size:32px;color:#16845b;font-weight:bold}
-
+.balance{font-size:32px;color:#16845b;font-weight:bold;overflow-wrap:anywhere}
 button{background:#193e69;color:white;border:0;border-radius:10px;padding:13px 20px;font-size:16px;cursor:pointer;margin:5px}
-
-button:disabled{opacity:.4;cursor:not-allowed}
-
+button:disabled{opacity:.45;cursor:not-allowed}
 input{padding:12px;border:1px solid #ccd5df;border-radius:8px;font-size:16px;max-width:100%}
-
 input[type=range]{width:100%;accent-color:#16845b}
-
 .asset{background:#f4f7fb;border-radius:12px;padding:15px;margin:12px 0}
-
 .row{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
-
 .green{color:#16845b}
-
 .red{color:#c73838}
-
 .news{background:#fff2dc;border-right:5px solid #e8a82c;padding:18px;border-radius:10px}
-
 .small{font-size:13px;color:#68788c}
-
-table{width:100%;border-collapse:collapse}
-
-td,th{padding:12px;border-bottom:1px solid #e5eaf0;text-align:right}
-
-.hidden{display:none}
-
+table{width:100%;border-collapse:collapse;font-size:14px}
+td,th{padding:10px;border-bottom:1px solid #e5eaf0;text-align:right}
+.table-wrap{overflow-x:auto}
+.notice{background:#eaf4ff;padding:14px;border-radius:10px;line-height:1.8}
 footer{text-align:center;color:#758398;font-size:12px;padding:25px}
-
 </style>
-
 </head>
-
 <body>
 
 <header>
-
 <div>🏆 النادي الاقتصادي</div>
-
 <h1>💸 تحدّي المليون</h1>
-
 <p>استثمر، واجه أخبار السوق، وغيّر قراراتك!</p>
-
 </header>
 
 <main id="app"></main>
 
 <footer>
-
-لعبة تعليمية بأموال وأحداث افتراضية وليست توصيات استثمارية.
-
+جميع الأموال والأحداث افتراضية لأغراض تعليمية.
 </footer>
 
 <script>
-
 "use strict";
 
 const START = 1000000;
+const KEY = "million-game-v4";
 
-const KEY = "million-game-v3";
+const API_URL =
+"https://script.google.com/macros/s/AKfycbw_67BGf2GUZFiIWv7UvjUJgBO66XcP1_SLc2xl0ihcjd2umoAlNQRNNvud0Zkw0jR4/exec";
 
 const assets = [
-
- {name:"الأسهم",icon:"📈"},
-
- {name:"العقارات",icon:"🏢"},
-
- {name:"المشاريع",icon:"🏪"},
-
- {name:"النقد",icon:"💰"}
-
+{name:"الأسهم",icon:"📈"},
+{name:"العقارات",icon:"🏢"},
+{name:"المشاريع",icon:"🏪"},
+{name:"النقد",icon:"💰"}
 ];
 
 const events = [
-
- {
-
- title:"انتعاش اقتصادي",
-
- text:"ارتفع الطلب وتحسنت أرباح الشركات.",
-
- rates:[15,8,20,0]
-
- },
-
- {
-
- title:"ارتفاع أسعار الفائدة",
-
- text:"تأثرت الأسواق بارتفاع تكلفة التمويل.",
-
- rates:[-10,-8,-5,0]
-
- },
-
- {
-
- title:"نمو القطاع العقاري",
-
- text:"زاد الطلب على العقارات.",
-
- rates:[5,18,3,0]
-
- },
-
- {
-
- title:"تباطؤ اقتصادي",
-
- text:"انخفض الطلب وتراجعت بعض الاستثمارات.",
-
- rates:[-15,-7,-12,0]
-
- },
-
- {
-
- title:"تعافٍ اقتصادي",
-
- text:"تحسنت الأسواق وعادت الاستثمارات للنمو.",
-
- rates:[12,6,15,0]
-
- }
-
+{
+title:"انتعاش اقتصادي",
+text:"ارتفع الطلب وتحسنت أرباح الشركات.",
+rates:[15,8,20,0]
+},
+{
+title:"ارتفاع أسعار الفائدة",
+text:"تأثرت الأسواق بارتفاع تكلفة التمويل.",
+rates:[-10,-8,-5,0]
+},
+{
+title:"نمو القطاع العقاري",
+text:"زاد الطلب على العقارات.",
+rates:[5,18,3,0]
+},
+{
+title:"تباطؤ اقتصادي",
+text:"انخفض الطلب وتراجعت بعض الاستثمارات.",
+rates:[-15,-7,-12,0]
+},
+{
+title:"تعافٍ اقتصادي",
+text:"تحسنت الأسواق وعادت الاستثمارات للنمو.",
+rates:[12,6,15,0]
+}
 ];
 
 let game = null;
-
 let draft = [25,25,25,25];
+let sending = false;
 
 const app = document.getElementById("app");
 
 function money(n){
-
- return Math.round(n).toLocaleString("en-US")+" ريال";
-
-}
-
-function save(){
-
- localStorage.setItem(KEY,JSON.stringify(game));
-
-}
-
-function load(){
-
- try{
-
-  const data=JSON.parse(localStorage.getItem(KEY));
-
-  if(data && typeof data.balance==="number" &&
-
-     Array.isArray(data.history)){
-
-   return data;
-
-  }
-
- }catch(e){}
-
- return null;
-
-}
-
-function reset(){
-
- if(confirm("هل تريد بدء لعبة جديدة؟ سيتم حذف تقدمك الحالي.")){
-
-  localStorage.removeItem(KEY);
-
-  game=null;
-
-  draft=[25,25,25,25];
-
-  render();
-
- }
-
-}
-
-function start(){
-
- const name=document.getElementById("name").value.trim();
-
- if(!name){
-
-  alert("اكتب اسمك أولًا");
-
-  return;
-
- }
-
- game={
-
-  name:name,
-
-  balance:START,
-
-  round:0,
-
-  phase:"allocate",
-
-  allocation:[],
-
-  history:[]
-
- };
-
- save();
-
- render();
-
-}
-
-function intro(){
-
- app.innerHTML=`
-
- <section class="card">
-
- <h2>مرحبًا بك في تحدّي المليون! 🎉</h2>
-
- <p>لديك مليون ريال افتراضي. هل تستطيع تنمية ثروتك خلال خمس جولات؟</p>
-
- <p>اكتب اسمك لتبدأ:</p>
-
- <input id="name" placeholder="اسم المشارك" maxlength="40">
-
- <br><br>
-
- <button onclick="start()">ابدأ اللعبة 🚀</button>
-
- </section>`;
-
-}
-
-function allocate(){
-
- const total=draft.reduce((a,b)=>a+b,0);
-
- let html=`
-
- <section class="card">
-
- <div class="row">
-
- <h2>الجولة ${game.round+1} من 5</h2>
-
- <button onclick="reset()">لعبة جديدة</button>
-
- </div>
-
- <p>مرحبًا ${escapeHTML(game.name)} 👋</p>
-
- <p>ثروتك الحالية:</p>
-
- <div class="balance">${money(game.balance)}</div>
-
- </section>
-
- <section class="card">
-
- <h2>وزّع استثماراتك</h2>
-
- <p>اختر نسبة الاستثمار في كل قطاع.</p>
-
- <p>المجموع: <b id="total">${total}%</b></p>
-
- <div id="assets"></div>
-
- <button id="confirm" onclick="confirmAllocation()">
-
- تأكيد الاستثمار
-
- </button>
-
- </section>`;
-
- app.innerHTML=html;
-
- drawAssets();
-
+return Math.round(n).toLocaleString("en-US")+" ريال";
 }
 
 function escapeHTML(s){
+return String(s).replace(/[&<>"']/g,c=>({
+"&":"&amp;",
+"<":"&lt;",
+">":"&gt;",
+'"':"&quot;",
+"'":"&#39;"
+}[c]));
+}
 
- return String(s).replace(/[&<>"']/g,c=>({
+function save(){
+localStorage.setItem(KEY,JSON.stringify(game));
+}
 
- "&":"&amp;","<":"&lt;",">":"&gt;",
+function load(){
+try{
+const data=JSON.parse(localStorage.getItem(KEY));
+if(
+data &&
+typeof data.balance==="number" &&
+Array.isArray(data.history)
+){
+return data;
+}
+}catch(e){}
+return null;
+}
 
- '"':"&quot;","'":"&#39;"
+function newID(){
+if(crypto.randomUUID){
+return crypto.randomUUID();
+}
+const bytes=new Uint8Array(16);
+crypto.getRandomValues(bytes);
+return Array.from(bytes,b=>
+b.toString(16).padStart(2,"0")
+).join("");
+}
 
- }[c]));
+function reset(){
+if(confirm("هل تريد بدء لعبة جديدة؟ سيتم حذف تقدمك الحالي.")){
+localStorage.removeItem(KEY);
+game=null;
+draft=[25,25,25,25];
+render();
+}
+}
 
+function start(){
+const name=document.getElementById("name").value.trim();
+
+if(!name){
+alert("اكتب اسمك أولًا");
+return;
+}
+
+game={
+id:newID(),
+name:name,
+balance:START,
+round:0,
+phase:"allocate",
+allocation:[],
+history:[],
+submitted:false,
+sendStatus:""
+};
+
+save();
+render();
+}
+
+function intro(){
+app.innerHTML=`
+<section class="card">
+<h2>مرحبًا بك في تحدّي المليون! 🎉</h2>
+<p>لديك مليون ريال افتراضي.</p>
+<p>هل تستطيع تنمية ثروتك خلال خمس جولات؟</p>
+<input id="name" placeholder="اسم المشارك" maxlength="40">
+<br><br>
+<button onclick="start()">ابدأ اللعبة 🚀</button>
+</section>`;
+}
+
+function allocate(){
+const total=draft.reduce((a,b)=>a+b,0);
+
+app.innerHTML=`
+<section class="card">
+<div class="row">
+<h2>الجولة ${game.round+1} من 5</h2>
+<button onclick="reset()">لعبة جديدة</button>
+</div>
+<p>مرحبًا ${escapeHTML(game.name)} 👋</p>
+<p>ثروتك الحالية:</p>
+<div class="balance">${money(game.balance)}</div>
+</section>
+
+<section class="card">
+<h2>وزّع استثماراتك</h2>
+<p>اختر نسبة الاستثمار في كل قطاع.</p>
+<p>المجموع: <b id="total">${total}%</b></p>
+<div id="assets"></div>
+<button id="confirm" onclick="confirmAllocation()">
+تأكيد الاستثمار
+</button>
+</section>`;
+
+drawAssets();
 }
 
 function drawAssets(){
+let html="";
 
- let html="";
+assets.forEach((a,i)=>{
+html+=`
+<div class="asset">
+<div class="row">
+<b>${a.icon} ${a.name}</b>
+<b>${draft[i]}%</b>
+</div>
+<input type="range" min="0" max="100" step="5"
+value="${draft[i]}"
+oninput="changeAllocation(${i},this.value)">
+<div class="small">
+${money(game.balance*draft[i]/100)}
+</div>
+</div>`;
+});
 
- assets.forEach((a,i)=>{
+document.getElementById("assets").innerHTML=html;
 
- html+=`
+const total=draft.reduce((a,b)=>a+b,0);
 
- <div class="asset">
-
- <div class="row">
-
- <b>${a.icon} ${a.name}</b>
-
- <b>${draft[i]}%</b>
-
- </div>
-
- <input type="range" min="0" max="100" step="5"
-
- value="${draft[i]}"
-
- oninput="changeAllocation(${i},this.value)">
-
- <div class="small">${money(game.balance*draft[i]/100)}</div>
-
- </div>`;
-
- });
-
- document.getElementById("assets").innerHTML=html;
-
- const total=draft.reduce((a,b)=>a+b,0);
-
- document.getElementById("total").textContent=total+"%";
-
- document.getElementById("confirm").disabled=total!==100;
-
+document.getElementById("total").textContent=total+"%";
+document.getElementById("confirm").disabled=total!==100;
 }
 
 function changeAllocation(i,value){
-
- draft[i]=Number(value);
-
- drawAssets();
-
+draft[i]=Number(value);
+drawAssets();
 }
 
 function confirmAllocation(){
+const total=draft.reduce((a,b)=>a+b,0);
 
- const total=draft.reduce((a,b)=>a+b,0);
+if(total!==100){
+alert("يجب توزيع 100% من أموالك");
+return;
+}
 
- if(total!==100){
-
-  alert("يجب توزيع 100% من أموالك");
-
-  return;
-
- }
-
- game.allocation=[...draft];
-
- game.phase="news";
-
- save();
-
- render();
-
+game.allocation=[...draft];
+game.phase="news";
+save();
+render();
 }
 
 function news(){
+const ev=events[game.round];
 
- const ev=events[game.round];
-
- app.innerHTML=`
-
- <section class="card">
-
- <h2>📰 خبر اقتصادي عاجل!</h2>
-
- <div class="news">
-
- <h2>${ev.title}</h2>
-
- <p>${ev.text}</p>
-
- </div>
-
- <p>لقد استثمرت أموالك قبل ظهور الخبر.</p>
-
- <p>اضغط لمعرفة تأثيره على محفظتك.</p>
-
- <button onclick="calculate()">كشف النتائج 📊</button>
-
- </section>`;
-
+app.innerHTML=`
+<section class="card">
+<h2>📰 خبر اقتصادي عاجل!</h2>
+<div class="news">
+<h2>${ev.title}</h2>
+<p>${ev.text}</p>
+</div>
+<p>لقد استثمرت أموالك قبل ظهور الخبر.</p>
+<p>اضغط لمعرفة تأثيره على محفظتك.</p>
+<button onclick="calculate()">كشف النتائج 📊</button>
+</section>`;
 }
 
 function calculate(){
+if(game.phase!=="news")return;
 
- if(game.phase!=="news")return;
+const ev=events[game.round];
+const old=game.balance;
 
- const ev=events[game.round];
+const values=game.allocation.map((p,i)=>
+old*p/100*(1+ev.rates[i]/100)
+);
 
- const old=game.balance;
+const next=values.reduce((a,b)=>a+b,0);
 
- const values=game.allocation.map((p,i)=>
+game.history.push({
+title:ev.title,
+before:old,
+after:next,
+allocation:[...game.allocation],
+values:values
+});
 
-  old*p/100*(1+ev.rates[i]/100)
+game.balance=next;
+game.phase="result";
 
- );
-
- const next=values.reduce((a,b)=>a+b,0);
-
- game.history.push({
-
-  title:ev.title,
-
-  before:old,
-
-  after:next,
-
-  allocation:[...game.allocation],
-
-  values:values
-
- });
-
- game.balance=next;
-
- game.phase="result";
-
- save();
-
- render();
-
+save();
+render();
 }
 
 function result(){
+const h=game.history[game.history.length-1];
+const gain=h.after-h.before;
 
- const h=game.history[game.history.length-1];
+let rows="";
 
- const gain=h.after-h.before;
+assets.forEach((a,i)=>{
+rows+=`
+<tr>
+<td>${a.icon} ${a.name}</td>
+<td>${h.allocation[i]}%</td>
+<td>${events[game.round].rates[i]}%</td>
+<td>${money(h.values[i])}</td>
+</tr>`;
+});
 
- let rows="";
+app.innerHTML=`
+<section class="card">
+<h2>نتائج الجولة ${game.round+1} 📊</h2>
+<p>ثروتك بعد الخبر:</p>
+<div class="balance">${money(game.balance)}</div>
+<p class="${gain>=0?'green':'red'}">
+${gain>=0?'ربح':'خسارة'}:
+${money(Math.abs(gain))}
+</p>
+</section>
 
- assets.forEach((a,i)=>{
+<section class="card">
+<h2>تفاصيل استثماراتك</h2>
+<div class="table-wrap">
+<table>
+<tr>
+<th>القطاع</th>
+<th>النسبة</th>
+<th>التغير</th>
+<th>القيمة</th>
+</tr>
+${rows}
+</table>
+</div>
+</section>
 
- rows+=`
-
- <tr>
-
- <td>${a.icon} ${a.name}</td>
-
- <td>${h.allocation[i]}%</td>
-
- <td>${events[game.round].rates[i]}%</td>
-
- <td>${money(h.values[i])}</td>
-
- </tr>`;
-
- });
-
- app.innerHTML=`
-
- <section class="card">
-
- <h2>نتائج الجولة ${game.round+1} 📊</h2>
-
- <p>ثروتك بعد الخبر:</p>
-
- <div class="balance">${money(game.balance)}</div>
-
- <p class="${gain>=0?'green':'red'}">
-
- ${gain>=0?'ربح':'خسارة'}:
-
- ${money(Math.abs(gain))}
-
- </p>
-
- </section>
-
- <section class="card">
-
- <h2>تفاصيل استثماراتك</h2>
-
- <table>
-
- <tr>
-
- <th>القطاع</th>
-
- <th>النسبة</th>
-
- <th>التغير</th>
-
- <th>القيمة</th>
-
- </tr>
-
- ${rows}
-
- </table>
-
- </section>
-
- <section class="card">
-
- <p>يمكنك إعادة توزيع ثروتك في الجولة التالية.</p>
-
- <button onclick="nextRound()">
-
- ${game.round===4?'عرض النتيجة النهائية 🏆':'الجولة التالية ←'}
-
- </button>
-
- </section>`;
-
+<section class="card">
+<p>يمكنك إعادة توزيع ثروتك في الجولة التالية.</p>
+<button onclick="nextRound()">
+${game.round===4?'عرض النتيجة النهائية 🏆':'الجولة التالية ←'}
+</button>
+</section>`;
 }
 
 function nextRound(){
+if(game.phase!=="result")return;
 
- if(game.phase!=="result")return;
+game.round++;
 
- game.round++;
+if(game.round>=5){
+game.phase="done";
+}else{
+game.phase="allocate";
+draft=[25,25,25,25];
+}
 
- if(game.round>=5){
-
-  game.phase="done";
-
- }else{
-
-  game.phase="allocate";
-
-  draft=[25,25,25,25];
-
- }
-
- save();
-
- render();
-
+save();
+render();
 }
 
 function done(){
+const gain=game.balance-START;
+const percent=gain/START*100;
 
- const gain=game.balance-START;
+let rows="";
 
- const percent=gain/START*100;
+game.history.forEach((h,i)=>{
+rows+=`
+<tr>
+<td>${i+1}</td>
+<td>${h.title}</td>
+<td>${money(h.after)}</td>
+</tr>`;
+});
 
- let rows="";
+let submitHTML="";
 
- game.history.forEach((h,i)=>{
+if(game.submitted){
+submitHTML=`
+<div class="notice">
+✅ سبق إرسال طلب نتيجتك.
+<p class="small">
+تأكّد من المنظّم أن نتيجتك وصلت إلى جدول النتائج.
+</p>
+</div>`;
+}else{
+submitHTML=`
+<div class="notice">
+<h2>🏆 سجّل نتيجتك</h2>
+<p>
+اضغط لإرسال اسمك ونتائج الجولات الخمس
+إلى النادي الاقتصادي.
+</p>
+<button id="submitScore" onclick="submitScore()">
+إرسال نتيجتي 🏆
+</button>
+<p id="sendMessage" class="small"></p>
+</div>`;
+}
 
- rows+=`
+app.innerHTML=`
+<section class="card">
+<h2>🏆 انتهى تحدّي المليون!</h2>
+<p>أحسنت يا ${escapeHTML(game.name)}!</p>
+<p>ثروتك النهائية:</p>
+<div class="balance">${money(game.balance)}</div>
+<p class="${gain>=0?'green':'red'}">
+${gain>=0?'الربح':'الخسارة'}:
+${money(Math.abs(gain))}
+</p>
+<p>العائد الكلي: ${percent.toFixed(2)}%</p>
+</section>
 
- <tr>
+<section class="card">
+<h2>سجل الجولات</h2>
+<div class="table-wrap">
+<table>
+<tr>
+<th>الجولة</th>
+<th>الخبر</th>
+<th>الثروة</th>
+</tr>
+${rows}
+</table>
+</div>
+</section>
 
- <td>${i+1}</td>
+<section class="card">
+${submitHTML}
+<br>
+<button onclick="reset()">العب من جديد 🔄</button>
+</section>`;
+}
 
- <td>${h.title}</td>
+async function submitScore(){
 
- <td>${money(h.after)}</td>
+if(!game || game.phase!=="done")return;
+if(game.submitted || sending)return;
 
- </tr>`;
+if(!game.id){
+game.id=newID();
+save();
+}
 
- });
+const button=document.getElementById("submitScore");
+const message=document.getElementById("sendMessage");
 
- app.innerHTML=`
+sending=true;
+button.disabled=true;
+button.textContent="جارٍ إرسال النتيجة...";
+message.textContent="يرجى الانتظار وعدم إغلاق الصفحة.";
 
- <section class="card">
+const payload={
+id:game.id,
+name:game.name,
+history:game.history.map(h=>({
+allocation:h.allocation
+}))
+};
 
- <h2>🏆 انتهى تحدّي المليون!</h2>
+try{
 
- <p>أحسنت يا ${escapeHTML(game.name)}!</p>
+await fetch(API_URL,{
+method:"POST",
+mode:"no-cors",
+headers:{
+"Content-Type":"text/plain"
+},
+body:JSON.stringify(payload)
+});
 
- <p>ثروتك النهائية:</p>
+game.submitted=true;
+game.sendStatus="sent-unverified";
+save();
 
- <div class="balance">${money(game.balance)}</div>
+message.textContent=
+"تم إرسال الطلب، لكن لا يمكن تأكيد حفظه من المتصفح. تحقّق من المنظّم.";
 
- <p class="${gain>=0?'green':'red'}">
+button.textContent="تم إرسال الطلب";
 
- ${gain>=0?'الربح':'الخسارة'}:
+setTimeout(render,1800);
 
- ${money(Math.abs(gain))}
+}catch(error){
 
- </p>
+message.textContent=
+"تعذر إرسال الطلب. تأكد من الإنترنت ثم حاول مجددًا.";
 
- <p>العائد الكلي: ${percent.toFixed(2)}%</p>
+button.disabled=false;
+button.textContent="إعادة محاولة الإرسال";
 
- </section>
-
- <section class="card">
-
- <h2>سجل الجولات</h2>
-
- <table>
-
- <tr><th>الجولة</th><th>الخبر</th><th>الثروة</th></tr>
-
- ${rows}
-
- </table>
-
- <button onclick="reset()">العب من جديد 🔄</button>
-
- </section>`;
+}finally{
+sending=false;
+}
 
 }
 
 function render(){
 
- if(!game){
+if(!game){
+intro();
+return;
+}
 
-  intro();
-
-  return;
-
- }
-
- if(game.phase==="allocate")allocate();
-
- else if(game.phase==="news")news();
-
- else if(game.phase==="result")result();
-
- else if(game.phase==="done")done();
-
- else intro();
+if(game.phase==="allocate")allocate();
+else if(game.phase==="news")news();
+else if(game.phase==="result")result();
+else if(game.phase==="done")done();
+else intro();
 
 }
 
 game=load();
-
 render();
 
 </script>
-
 </body>
-
 </html>
